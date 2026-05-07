@@ -11,6 +11,11 @@
 ### {{ skill.title }} (`{{ skill.id }}`)
 {{ skill.summary }}
 
+Source: {{ skill.source }} | Confidence: {{ skill.confidence }}
+{% if skill.match_reason %}
+Match reason: {{ skill.match_reason }}
+{% endif %}
+
 Rules:
 {% if skill.rules %}
 {% for item in skill.rules -%}

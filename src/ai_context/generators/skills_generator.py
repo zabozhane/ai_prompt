@@ -1,24 +1,37 @@
 from pathlib import Path
 
+from ai_context.llm.client import LLMClient
 from ai_context.schemas.project import ProjectSpec
-from ai_context.schemas.skills import SkillPack, SkillsContext
+from ai_context.schemas.skills import SkillPack, SkillsContext, SkillsFallbackProposal
+from ai_context.settings import Settings
 
 
 class SkillsGenerator:
     """Infers relevant skills and loads reusable local skill packs."""
 
-    def __init__(self, skills_root: Path) -> None:
+    def __init__(self, skills_root: Path, settings: Settings) -> None:
         self._skills_root = skills_root
+        self._llm = LLMClient(settings)
 
     def generate(self, spec: ProjectSpec) -> SkillsContext:
         available_skills = self._load_skill_packs()
         selected_ids = self._infer_skill_ids(spec, set(available_skills.keys()))
         selected_skills = [available_skills[skill_id] for skill_id in selected_ids]
 
+        rationale = self._selection_rationale(spec, selected_ids)
+        mcp_recommendations = self._mcp_recommendations(selected_ids, spec)
+
+        if not selected_skills:
+            fallback = self._generate_fallback_skills(spec)
+            generated_skills = self._convert_generated_skills(fallback)
+            selected_skills.extend(generated_skills)
+            rationale.extend(fallback.selection_rationale)
+            mcp_recommendations.extend(fallback.mcp_recommendations)
+
         return SkillsContext(
             selected_skills=selected_skills,
-            selection_rationale=self._selection_rationale(spec, selected_ids),
-            mcp_recommendations=self._mcp_recommendations(selected_ids, spec),
+            selection_rationale=list(dict.fromkeys(rationale)),
+            mcp_recommendations=list(dict.fromkeys(mcp_recommendations)),
         )
 
     def _load_skill_packs(self) -> dict[str, SkillPack]:
@@ -41,6 +54,9 @@ class SkillsGenerator:
                 architecture_guidance=self._extract_points(file_map.get("architecture", "")),
                 pitfalls=self._extract_points(file_map.get("pitfalls", "")),
                 source_files=sorted(file_map.keys()),
+                source="local_pack",
+                confidence="high",
+                match_reason="Matched by local skill keyword rules.",
             )
         return packs
 
@@ -88,8 +104,6 @@ class SkillsGenerator:
             selected.append("telegram_bot")
         if "async" in text or "asyncio" in text:
             selected.append("python_async")
-        if "python" in text and "python_async" not in selected and "python_async" in available_ids:
-            selected.append("python_async")
 
         filtered = [skill_id for skill_id in selected if skill_id in available_ids]
         return list(dict.fromkeys(filtered))
@@ -98,7 +112,8 @@ class SkillsGenerator:
         if not selected_ids:
             return [
                 "No matching local skill packs found for this project spec.",
-                "Skills can be added by creating folders under src/ai_context/skills/.",
+                "Generated project-specific fallback skills from LLM.",
+                "You can improve deterministic matching by adding local packs under src/ai_context/skills/.",
             ]
 
         reasons: list[str] = []
@@ -134,3 +149,43 @@ class SkillsGenerator:
 
         # Stable order and dedupe.
         return list(dict.fromkeys(recommendations))
+
+    def _generate_fallback_skills(self, spec: ProjectSpec) -> SkillsFallbackProposal:
+        system = (
+            "You generate concise, reusable engineering skill packs for one concrete project. "
+            "Skills are context packs, not autonomous agents. "
+            "Avoid overengineering and keep recommendations practical."
+        )
+        user = (
+            "Project spec JSON:\n"
+            f"{spec.model_dump_json(indent=2)}\n\n"
+            "Return 1-2 domain-relevant skills with concrete rules, conventions, architecture guidance, and pitfalls. "
+            "Also return short selection rationale and MCP recommendations."
+        )
+        return self._llm.generate_structured(
+            system=system,
+            user=user,
+            schema=SkillsFallbackProposal,
+        )
+
+    def _convert_generated_skills(self, fallback: SkillsFallbackProposal) -> list[SkillPack]:
+        converted: list[SkillPack] = []
+        for index, generated in enumerate(fallback.generated_skills, start=1):
+            skill_id = generated.title.lower().replace(" ", "_").replace("-", "_")
+            converted.append(
+                SkillPack(
+                    id=skill_id or f"generated_skill_{index}",
+                    title=generated.title,
+                    summary=generated.summary,
+                    prompts=generated.prompts,
+                    rules=generated.rules,
+                    conventions=generated.conventions,
+                    architecture_guidance=generated.architecture_guidance,
+                    pitfalls=generated.pitfalls,
+                    source_files=[],
+                    source="llm_fallback",
+                    confidence="medium",
+                    match_reason="Generated as fallback because no local skill packs matched.",
+                )
+            )
+        return converted

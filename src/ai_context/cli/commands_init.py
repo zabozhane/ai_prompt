@@ -11,6 +11,7 @@ from ai_context.generators.task_generator import TaskGenerator
 from ai_context.renderers.markdown_renderer import MarkdownRenderer
 from ai_context.settings import get_settings
 from ai_context.storage.state_store import StateStore
+from ai_context.workflows.workflow_analyzer import WorkflowAnalyzer
 
 
 def init_command(
@@ -45,7 +46,7 @@ def init_command(
     architecture_generator = ArchitectureGenerator(settings)
     task_generator = TaskGenerator(settings)
     skills_root = Path(__file__).resolve().parent.parent / "skills"
-    skills_generator = SkillsGenerator(skills_root=skills_root)
+    skills_generator = SkillsGenerator(skills_root=skills_root, settings=settings)
 
     if not preferred_stack or not constraints:
         proposal = setup_generator.propose(
@@ -82,6 +83,16 @@ def init_command(
     architecture = architecture_generator.generate(spec)
     tasks = task_generator.generate(spec, architecture)
     skills = skills_generator.generate(spec)
+    workflow_analyzer = WorkflowAnalyzer()
+    workflow = workflow_analyzer.analyze(
+        project_idea=project_idea,
+        preferred_stack=preferred_stack,
+        constraints=constraints,
+        spec=spec,
+        architecture=architecture,
+        tasks=tasks,
+        skills=skills,
+    )
 
     root = selected_output_dir.expanduser().resolve()
     if not root.exists():
@@ -100,6 +111,7 @@ def init_command(
     state_store.save_architecture(architecture)
     state_store.save_tasks(tasks)
     state_store.save_skills(skills)
+    state_store.save_workflow(workflow)
 
     templates_dir = Path(__file__).resolve().parent.parent / "templates"
     renderer = MarkdownRenderer(templates_dir)
@@ -108,9 +120,11 @@ def init_command(
         architecture=architecture,
         tasks=tasks,
         skills=skills,
+        workflow=workflow,
         output_dir=root,
     )
 
     print("[green]Context generated successfully.[/green]")
     print(f"Output directory: {root}")
+    print(f"Workflow quality score: {workflow.quality_score}/100")
     print("JSON state written to .ai/, markdown artifacts rendered successfully.")

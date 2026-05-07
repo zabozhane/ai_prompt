@@ -1,0 +1,29 @@
+# Session Handoff
+
+## Completed In This Session
+- Initial project context generated.
+- No implementation task has been executed yet.
+
+## Test Summary
+- Context generation pipeline completed successfully.
+- Review generated artifacts before starting implementation.
+
+## Known Issues / Risks
+{% if workflow.warnings %}
+{% for warning in workflow.warnings -%}
+- {{ warning }}
+{% endfor %}
+{% else %}
+- None identified in workflow checks.
+{% endif %}
+
+## Next Recommended Task
+{% if tasks.tasks %}
+- {{ tasks.tasks[0].id }} — {{ tasks.tasks[0].title }}
+{% else %}
+- No tasks available. Regenerate tasks before implementation.
+{% endif %}
+
+## Notes For Next Session
+- Start by reading `CURSOR_EXECUTION_MODE.md`.
+- Use `.ai/*.json` as source of truth.
