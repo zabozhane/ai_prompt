@@ -1,0 +1,14 @@
+# Session Prompt
+
+You are working on **{{ spec.project_name }}**.
+
+Focus for this session:
+1. Pick the highest priority task from `TASKS.md`.
+2. Implement small, verifiable increments.
+3. Keep architecture constraints from `ARCHITECTURE.md`.
+4. Update `.ai/*.json` state only through CLI workflows.
+
+Suggested first tasks:
+{% for task in tasks.tasks[:3] -%}
+- {{ task.id }} — {{ task.title }}
+{% endfor %}

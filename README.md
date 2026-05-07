@@ -1,0 +1,22 @@
+# ai-context
+
+CLI-first AI context generation tool for AI-assisted software development.
+
+## Quickstart
+
+1. Create and activate a Python 3.12+ virtual environment.
+2. Install dependencies:
+   - `pip install -e .`
+3. Configure environment:
+   - `cp .env.example .env`
+   - Fill `AI_CONTEXT_OPENAI_API_KEY`
+4. Run:
+   - `ai-context init`
+   - or target another folder: `ai-context init --output-dir /path/to/project --create-dir`
+
+## Philosophy
+
+- Filesystem-first
+- JSON as source of truth
+- Deterministic markdown rendering
+- Simple, hackable architecture

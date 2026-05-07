@@ -1,0 +1,20 @@
+# Architecture
+
+## Overview
+{{ architecture.overview }}
+
+## Components
+{% for component in architecture.components %}
+### {{ component.name }}
+{{ component.purpose }}
+
+Responsibilities:
+{% for item in component.responsibilities -%}
+- {{ item }}
+{% endfor %}
+{% endfor %}
+
+## Data Flow
+{% for step in architecture.data_flow -%}
+- {{ step }}
+{% endfor %}

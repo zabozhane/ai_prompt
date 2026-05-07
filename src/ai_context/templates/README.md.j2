@@ -1,0 +1,26 @@
+# {{ spec.project_name }}
+
+## Project Idea
+{{ spec.idea }}
+
+## Preferred Stack
+{{ spec.preferred_stack }}
+
+## Constraints
+{% if spec.constraints %}
+{% for c in spec.constraints -%}
+- {{ c }}
+{% endfor %}
+{% else %}
+- No explicit constraints provided.
+{% endif %}
+
+## Goals
+{% for g in spec.goals -%}
+- {{ g }}
+{% endfor %}
+
+## Non-goals
+{% for ng in spec.non_goals -%}
+- {{ ng }}
+{% endfor %}

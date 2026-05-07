@@ -1,0 +1,13 @@
+# Cursor Context
+
+## Project
+- Name: {{ spec.project_name }}
+- Stack: {{ spec.preferred_stack }}
+
+## Architecture Summary
+{{ architecture.overview }}
+
+## Current Task Backlog
+{% for task in tasks.tasks -%}
+- {{ task.id }}: {{ task.title }}
+{% endfor %}

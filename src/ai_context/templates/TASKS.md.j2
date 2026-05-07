@@ -1,0 +1,18 @@
+# Implementation Tasks
+
+{% for task in tasks.tasks %}
+## {{ task.id }} — {{ task.title }}
+Priority: {{ task.priority }}
+
+{{ task.description }}
+
+Depends on:
+{% if task.depends_on %}
+{% for dep in task.depends_on -%}
+- {{ dep }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+{% endfor %}
