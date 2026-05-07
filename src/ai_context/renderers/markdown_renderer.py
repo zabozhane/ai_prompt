@@ -45,5 +45,10 @@ class MarkdownRenderer:
         self._render_file("SKILLS.md.j2", output_dir / "SKILLS.md", context)
         self._render_file("MCP.md.j2", output_dir / "MCP.md", context)
         self._render_file("CURSOR_CONTEXT.md.j2", output_dir / "CURSOR_CONTEXT.md", context)
+        self._render_file(
+            "CURSOR_EXECUTION_MODE.md.j2",
+            output_dir / "CURSOR_EXECUTION_MODE.md",
+            context,
+        )
         self._render_file("SESSION_PROMPT.md.j2", output_dir / "SESSION_PROMPT.md", context)
         self._render_file("WORKFLOW_REPORT.md.j2", output_dir / "WORKFLOW_REPORT.md", context)
