@@ -4,6 +4,7 @@ from jinja2 import Environment, FileSystemLoader
 
 from ai_context.schemas.architecture import ArchitectureSpec
 from ai_context.schemas.project import ProjectSpec
+from ai_context.schemas.skills import SkillsContext
 from ai_context.schemas.tasks import TaskList
 
 
@@ -26,15 +27,19 @@ class MarkdownRenderer:
         spec: ProjectSpec,
         architecture: ArchitectureSpec,
         tasks: TaskList,
+        skills: SkillsContext,
         output_dir: Path,
     ) -> None:
         context = {
             "spec": spec.model_dump(),
             "architecture": architecture.model_dump(),
             "tasks": tasks.model_dump(),
+            "skills": skills.model_dump(),
         }
         self._render_file("README.md.j2", output_dir / "README.md", context)
         self._render_file("ARCHITECTURE.md.j2", output_dir / "ARCHITECTURE.md", context)
         self._render_file("TASKS.md.j2", output_dir / "TASKS.md", context)
+        self._render_file("SKILLS.md.j2", output_dir / "SKILLS.md", context)
+        self._render_file("MCP.md.j2", output_dir / "MCP.md", context)
         self._render_file("CURSOR_CONTEXT.md.j2", output_dir / "CURSOR_CONTEXT.md", context)
         self._render_file("SESSION_PROMPT.md.j2", output_dir / "SESSION_PROMPT.md", context)

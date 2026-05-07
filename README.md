@@ -13,6 +13,7 @@ CLI-first AI context generation tool for AI-assisted software development.
 4. Run:
    - `ai-context init`
    - or target another folder: `ai-context init --output-dir /path/to/project --create-dir`
+   - stack/constraints can be left empty, then CLI will auto-suggest and ask for confirmation
 
 ## Philosophy
 

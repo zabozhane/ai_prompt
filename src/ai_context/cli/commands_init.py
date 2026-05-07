@@ -4,6 +4,8 @@ import typer
 from rich import print
 
 from ai_context.generators.architecture_generator import ArchitectureGenerator
+from ai_context.generators.setup_generator import SetupGenerator
+from ai_context.generators.skills_generator import SkillsGenerator
 from ai_context.generators.spec_generator import SpecGenerator
 from ai_context.generators.task_generator import TaskGenerator
 from ai_context.renderers.markdown_renderer import MarkdownRenderer
@@ -32,15 +34,45 @@ def init_command(
         selected_output_dir = Path(raw_output_dir)
 
     project_idea = typer.prompt("Project idea")
-    preferred_stack = typer.prompt("Preferred stack")
+    preferred_stack = typer.prompt("Preferred stack (optional)", default="").strip()
     raw_constraints = typer.prompt("Constraints (comma-separated)", default="")
     constraints = [item.strip() for item in raw_constraints.split(",") if item.strip()]
 
     settings = get_settings()
 
+    setup_generator = SetupGenerator(settings)
     spec_generator = SpecGenerator(settings)
     architecture_generator = ArchitectureGenerator(settings)
     task_generator = TaskGenerator(settings)
+    skills_root = Path(__file__).resolve().parent.parent / "skills"
+    skills_generator = SkillsGenerator(skills_root=skills_root)
+
+    if not preferred_stack or not constraints:
+        proposal = setup_generator.propose(
+            project_idea=project_idea,
+            preferred_stack=preferred_stack or None,
+            constraints=constraints or None,
+        )
+        proposed_stack = preferred_stack or proposal.preferred_stack
+        proposed_constraints = constraints or proposal.constraints
+
+        print("[cyan]Auto-suggested setup:[/cyan]")
+        print(f"- preferred stack: {proposed_stack}")
+        print(
+            "- constraints: "
+            + (", ".join(proposed_constraints) if proposed_constraints else "none")
+        )
+
+        if typer.confirm("Use this setup?", default=True):
+            preferred_stack = proposed_stack
+            constraints = proposed_constraints
+        else:
+            preferred_stack = typer.prompt("Preferred stack", default=proposed_stack).strip()
+            edited_constraints = typer.prompt(
+                "Constraints (comma-separated)",
+                default=", ".join(proposed_constraints),
+            )
+            constraints = [item.strip() for item in edited_constraints.split(",") if item.strip()]
 
     spec = spec_generator.generate(
         project_idea=project_idea,
@@ -49,6 +81,7 @@ def init_command(
     )
     architecture = architecture_generator.generate(spec)
     tasks = task_generator.generate(spec, architecture)
+    skills = skills_generator.generate(spec)
 
     root = selected_output_dir.expanduser().resolve()
     if not root.exists():
@@ -66,10 +99,17 @@ def init_command(
     state_store.save_spec(spec)
     state_store.save_architecture(architecture)
     state_store.save_tasks(tasks)
+    state_store.save_skills(skills)
 
     templates_dir = Path(__file__).resolve().parent.parent / "templates"
     renderer = MarkdownRenderer(templates_dir)
-    renderer.render_all(spec=spec, architecture=architecture, tasks=tasks, output_dir=root)
+    renderer.render_all(
+        spec=spec,
+        architecture=architecture,
+        tasks=tasks,
+        skills=skills,
+        output_dir=root,
+    )
 
     print("[green]Context generated successfully.[/green]")
     print(f"Output directory: {root}")

@@ -1,0 +1,9 @@
+# MCP Recommendations
+
+{% if skills.mcp_recommendations %}
+{% for item in skills.mcp_recommendations -%}
+- {{ item }}
+{% endfor %}
+{% else %}
+- No MCP recommendations inferred for this project.
+{% endif %}

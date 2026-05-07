@@ -3,6 +3,7 @@ from pathlib import Path
 
 from ai_context.schemas.architecture import ArchitectureSpec
 from ai_context.schemas.project import ProjectSpec
+from ai_context.schemas.skills import SkillsContext
 from ai_context.schemas.tasks import TaskList
 
 
@@ -23,3 +24,6 @@ class StateStore:
 
     def save_tasks(self, tasks: TaskList) -> None:
         self._write_json("tasks.json", tasks.model_dump())
+
+    def save_skills(self, skills: SkillsContext) -> None:
+        self._write_json("skills.json", skills.model_dump())
