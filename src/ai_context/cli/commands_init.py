@@ -45,7 +45,7 @@ def init_command(
     architecture_generator = ArchitectureGenerator(settings)
     task_generator = TaskGenerator(settings)
     skills_root = Path(__file__).resolve().parent.parent / "skills"
-    skills_generator = SkillsGenerator(skills_root=skills_root)
+    skills_generator = SkillsGenerator(skills_root=skills_root, settings=settings)
 
     if not preferred_stack or not constraints:
         proposal = setup_generator.propose(

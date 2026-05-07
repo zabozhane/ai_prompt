@@ -10,7 +10,7 @@
 ## Applied Skills
 {% if skills.selected_skills %}
 {% for skill in skills.selected_skills -%}
-- {{ skill.id }}: {{ skill.summary }}
+- {{ skill.id }} ({{ skill.source }}): {{ skill.summary }}
 {% endfor %}
 {% else %}
 - No skill packs matched this project spec.
