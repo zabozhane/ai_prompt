@@ -1,0 +1,62 @@
+# Skills Context
+
+## Selection Rationale
+{% for reason in skills.selection_rationale -%}
+- {{ reason }}
+{% endfor %}
+
+## Selected Skill Packs
+{% if skills.selected_skills %}
+{% for skill in skills.selected_skills %}
+### {{ skill.title }} (`{{ skill.id }}`)
+{{ skill.summary }}
+
+Rules:
+{% if skill.rules %}
+{% for item in skill.rules -%}
+- {{ item }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+Conventions:
+{% if skill.conventions %}
+{% for item in skill.conventions -%}
+- {{ item }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+Architecture guidance:
+{% if skill.architecture_guidance %}
+{% for item in skill.architecture_guidance -%}
+- {{ item }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+Common pitfalls:
+{% if skill.pitfalls %}
+{% for item in skill.pitfalls -%}
+- {{ item }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+Prompts:
+{% if skill.prompts %}
+{% for item in skill.prompts -%}
+- {{ item }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+{% endfor %}
+{% else %}
+No skill packs were selected for this project spec.
+{% endif %}

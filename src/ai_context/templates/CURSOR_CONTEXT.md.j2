@@ -7,6 +7,24 @@
 ## Architecture Summary
 {{ architecture.overview }}
 
+## Applied Skills
+{% if skills.selected_skills %}
+{% for skill in skills.selected_skills -%}
+- {{ skill.id }}: {{ skill.summary }}
+{% endfor %}
+{% else %}
+- No skill packs matched this project spec.
+{% endif %}
+
+## MCP Recommendations
+{% if skills.mcp_recommendations %}
+{% for item in skills.mcp_recommendations -%}
+- {{ item }}
+{% endfor %}
+{% else %}
+- No MCP recommendations available.
+{% endif %}
+
 ## Current Task Backlog
 {% for task in tasks.tasks -%}
 - {{ task.id }}: {{ task.title }}
