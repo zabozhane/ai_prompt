@@ -21,3 +21,14 @@ CLI-first AI context generation tool for AI-assisted software development.
 - JSON as source of truth
 - Deterministic markdown rendering
 - Simple, hackable architecture
+
+## Prompt Editing
+
+LLM prompts are stored as editable text files in `src/ai_context/prompts/`:
+
+- `spec.*.txt`
+- `architecture.*.txt`
+- `tasks.*.txt`
+- `setup.*.txt`
+
+Update these files to tune generation behavior without changing Python logic.

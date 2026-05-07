@@ -1,0 +1,6 @@
+Project idea: {{ project_idea }}
+Preferred stack: {{ preferred_stack }}
+Constraints: {{ constraints }}
+Return output that fits the ProjectSpec schema.
+Treat constraints as hard boundaries.
+Do not add technologies that are not necessary for the stated idea and constraints.

@@ -1,6 +1,9 @@
+from pathlib import Path
+
 from ai_context.llm.client import LLMClient
 from ai_context.schemas.setup import SetupProposal
 from ai_context.settings import Settings
+from ai_context.utils.prompt_loader import PromptLoader
 
 
 class SetupGenerator:
@@ -8,6 +11,8 @@ class SetupGenerator:
 
     def __init__(self, settings: Settings) -> None:
         self._llm = LLMClient(settings)
+        prompts_dir = Path(__file__).resolve().parent.parent / "prompts"
+        self._prompts = PromptLoader(prompts_dir)
 
     def propose(
         self,
@@ -16,14 +21,13 @@ class SetupGenerator:
         preferred_stack: str | None = None,
         constraints: list[str] | None = None,
     ) -> SetupProposal:
-        system = (
-            "You generate pragmatic MVP stack/constraint suggestions for software projects. "
-            "Keep recommendations explicit, lightweight, and suitable for a solo engineer."
-        )
-        user = (
-            f"Project idea: {project_idea}\n"
-            f"Current preferred stack: {preferred_stack or 'not provided'}\n"
-            f"Current constraints: {constraints or []}\n"
-            "Return a concise suggested preferred_stack and a short list of constraints."
+        system = self._prompts.load_text("setup.system.txt")
+        user = self._prompts.render_text(
+            "setup.user.txt",
+            {
+                "project_idea": project_idea,
+                "preferred_stack": preferred_stack or "not provided",
+                "constraints": constraints or [],
+            },
         )
         return self._llm.generate_structured(system=system, user=user, schema=SetupProposal)

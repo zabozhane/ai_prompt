@@ -1,0 +1,5 @@
+Project idea: {{ project_idea }}
+Current preferred stack: {{ preferred_stack }}
+Current constraints: {{ constraints }}
+Return a concise suggested preferred_stack and a short list of constraints.
+If the user already provided stack/constraints, preserve them unless clearly inconsistent.
