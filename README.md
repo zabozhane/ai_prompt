@@ -27,7 +27,7 @@ engineering context artifacts you can use in Cursor and similar IDE workflows.
 ## Quickstart
 
 ```bash
-cd /Users/mymac/Documents/my_projects/ai_prompt
+cd /project_path
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install -U pip
