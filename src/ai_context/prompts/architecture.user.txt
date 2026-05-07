@@ -1,0 +1,4 @@
+Design architecture for the following project spec:
+{{ project_spec_json }}
+Return output that fits the ArchitectureSpec schema.
+Map each component to concrete responsibilities and data flow steps.

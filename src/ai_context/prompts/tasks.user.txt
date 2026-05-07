@@ -1,0 +1,7 @@
+Project spec:
+{{ project_spec_json }}
+
+Architecture:
+{{ architecture_json }}
+Return output that fits the TaskList schema.
+Use stable task IDs (for example: T1, T2, T3).

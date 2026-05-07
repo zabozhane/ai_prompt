@@ -1,24 +1,26 @@
+from pathlib import Path
+
 from ai_context.llm.client import LLMClient
 from ai_context.schemas.architecture import ArchitectureSpec
 from ai_context.schemas.project import ProjectSpec
 from ai_context.schemas.tasks import TaskList
 from ai_context.settings import Settings
+from ai_context.utils.prompt_loader import PromptLoader
 
 
 class TaskGenerator:
     def __init__(self, settings: Settings) -> None:
         self._llm = LLMClient(settings)
+        prompts_dir = Path(__file__).resolve().parent.parent / "prompts"
+        self._prompts = PromptLoader(prompts_dir)
 
     def generate(self, spec: ProjectSpec, architecture: ArchitectureSpec) -> TaskList:
-        system = (
-            "You break software implementation into clear, small tasks for iterative delivery. "
-            "Keep tasks practical and dependency-aware."
-        )
-        user = (
-            "Project spec:\n"
-            f"{spec.model_dump_json(indent=2)}\n\n"
-            "Architecture:\n"
-            f"{architecture.model_dump_json(indent=2)}\n"
-            "Return output that fits the TaskList schema."
+        system = self._prompts.load_text("tasks.system.txt")
+        user = self._prompts.render_text(
+            "tasks.user.txt",
+            {
+                "project_spec_json": spec.model_dump_json(indent=2),
+                "architecture_json": architecture.model_dump_json(indent=2),
+            },
         )
         return self._llm.generate_structured(system=system, user=user, schema=TaskList)
