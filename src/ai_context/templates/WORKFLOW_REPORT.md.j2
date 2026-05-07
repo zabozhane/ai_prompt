@@ -1,0 +1,35 @@
+# Workflow Report
+
+## Quality Score
+- Score: {{ workflow.quality_score }}/100
+
+## Inputs
+- Idea: {{ workflow.inputs.project_idea }}
+- Preferred stack: {{ workflow.inputs.preferred_stack }}
+- Constraints:
+{% if workflow.inputs.constraints %}
+{% for c in workflow.inputs.constraints -%}
+  - {{ c }}
+{% endfor %}
+{% else %}
+  - None
+{% endif %}
+
+## Checks
+{% for check in workflow.checks %}
+- {{ check.name }}: {% if check.passed %}PASS{% else %}FAIL{% endif %} — {{ check.details }}
+{% endfor %}
+
+## Warnings
+{% if workflow.warnings %}
+{% for warning in workflow.warnings -%}
+- {{ warning }}
+{% endfor %}
+{% else %}
+- None
+{% endif %}
+
+## Output Summary
+- Components: {{ workflow.outputs_summary.component_count }}
+- Tasks: {{ workflow.outputs_summary.task_count }}
+- Skills: {{ workflow.outputs_summary.skill_count }}

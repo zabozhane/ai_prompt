@@ -5,6 +5,7 @@ from ai_context.schemas.architecture import ArchitectureSpec
 from ai_context.schemas.project import ProjectSpec
 from ai_context.schemas.skills import SkillsContext
 from ai_context.schemas.tasks import TaskList
+from ai_context.schemas.workflow import WorkflowSpec
 
 
 class StateStore:
@@ -27,3 +28,6 @@ class StateStore:
 
     def save_skills(self, skills: SkillsContext) -> None:
         self._write_json("skills.json", skills.model_dump())
+
+    def save_workflow(self, workflow: WorkflowSpec) -> None:
+        self._write_json("workflow.json", workflow.model_dump())
